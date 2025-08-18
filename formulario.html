@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls - Formulário</title>
+  <link rel="stylesheet" href="login.css" />
+  <link rel="stylesheet" href="formulario.css" />
+</head>
+<body>
+  <div class="quiz-shell">
+    <header class="quiz-header">
+      <h1>Questionário</h1>
+      <p class="subtitle">Ajude a gente a te conhecer melhor</p>
+      <div class="progress">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+      <div class="step-info"><span id="stepNow">1</span> / <span id="stepTotal">15</span></div>
+    </header>
+
+    <main class="quiz-card">
+      <form id="quizForm" novalidate>
+      </form>
+    </main>
+
+    <footer class="quiz-actions">
+        <div style="display:flex; gap:10px">
+            <button id="btnLogout" class="btn ghost" type="button">Sair</button>
+            <button id="btnReset" class="btn ghost" type="button">Recomeçar</button>
+        </div>
+        <div style="display:flex; gap:10px">
+            <button id="btnBack" class="btn ghost" type="button">Voltar</button>
+            <button id="btnNext" class="btn" type="button">Avançar</button>
+        </div>
+    </footer>
+  </div>
+  <script type="module" src="formulario.js"></script>
+</body>
+</html>

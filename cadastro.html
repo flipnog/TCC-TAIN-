@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls - Cadastro</title>
+  <link rel="stylesheet" href="login.css" />
+  <style>
+    .hidden{display:none}
+    .hint{font-size:.85rem;color:#666;margin-top:6px}
+    .readonly{background:#f7f7f7}
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1 id="titulo">Cadastro</h1>
+    <p class="subtitle" id="subtitulo">Junte-se ao TECH RUN GIRLS</p>
+
+    <input type="text" id="nome" placeholder="Digite seu nome" required>
+    <input type="email" id="email" placeholder="Digite seu e-mail" required>
+
+    <input type="tel" id="contato" placeholder="Contato">
+
+    <div id="rowSenha">
+      <input type="password" id="password" placeholder="Crie uma senha" required>
+    </div>
+
+    <label for="tipo">Sou:</label>
+    <select id="tipo" required>
+      <option value="">Selecione...</option>
+      <option value="estudante">Estudante</option>
+      <option value="tutora">Tutora</option>
+    </select>
+
+    <div id="box-espec" class="hidden" style="margin-top:10px;text-align:left">
+      <label for="especialidades"><strong>Especialidades (apenas tutora)</strong></label>
+      <input id="especialidades" placeholder="Ex.: JavaScript, Python, DevOps, SQL, UX/UI">
+      <div class="hint">Separe por vírgulas. Usaremos isso para recomendar você às alunas.</div>
+    </div>
+
+    <button id="cadastroBtn">Cadastrar</button>
+    <p class="register-link">Já tem conta? <a href="login.html">Faça login</a></p>
+  </div>
+
+  <script type="module" src="cadastro.js"></script>
+</body>
+</html>

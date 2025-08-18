@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls - Resultado</title>
+  <link rel="stylesheet" href="login.css"/>
+  <style>
+    .wrap { text-align:left }
+    .pill { display:inline-block; padding:4px 10px; border-radius:999px; background:#ffe3f1; margin:4px; font-size:.85rem; }
+    .list { margin-top:12px; }
+    .tutora { padding:10px; border:1px solid #eee; border-radius:8px; margin:8px 0; }
+    .muted { font-size:.88rem; color:#666 }
+  </style>
+</head>
+<body>
+
+  <div class="login-container wrap">
+    <h1>Seu Resultado</h1>
+    <p class="subtitle">Categoria e papel sugeridos com próximos passos</p>
+
+    <h2 id="categoria">Carregando…</h2>
+    <h3 id="papel" style="margin-top:0.25rem;"></h3>
+
+    <div class="list">
+      <h3>Trilha sugerida</h3>
+      <ul id="trilha"></ul>
+    </div>
+
+    <div class="list">
+      <h3>Tutoras recomendadas</h3>
+      <div id="tutoras"></div>
+      <p id="hint" class="muted"></p>
+    </div>
+
+    <div style="margin-top:16px">
+      <a class="btn" href="mensagens.html">Mensagens</a>
+      <a class="pill" href="formulario.html">Refazer teste</a>
+      <a class="pill" href="login.html">Sair</a>
+    </div>
+  </div>
+
+  <script type="module" src="resultado.js"></script>
+</body>
+</html>

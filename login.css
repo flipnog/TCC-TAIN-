@@ -1,0 +1,60 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ff66b2, #ff99cc);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 300px;
+}
+
+.login-container h1 {
+  color: #ff3399;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #ff3399;
+  color: white;
+  padding: 10px;
+  border: none;
+  width: 100%;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #e62e8b;
+}
+
+.google-btn {
+  background-color: #4285F4;
+}
+
+.register-link {
+  margin-top: 15px;
+  font-size: 0.85rem;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls - Tutora</title>
+  <link rel="stylesheet" href="login.css"/>
+  <style>
+    body{background:linear-gradient(135deg,#ff66b2,#ff99cc)}
+    .wrap{max-width:980px;margin:20px auto;padding:0 16px}
+    .card{background:#fff;border:1px solid #eee;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:16px;margin:12px 0}
+    h1{color:#0c080a;margin:.2rem 0}
+    .muted{color:#000000;font-size:.92rem}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#ffe3f1;margin:4px 6px 0 0;font-size:.85rem}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .row > *{margin:2px 0}
+    .btn{background:#ff3399;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:#fff;color:#222;border:1px solid #eee}
+    .list .item{padding:12px;border:1px solid #f0f0f0;border-radius:12px;margin:8px 0}
+    .score{font-weight:700}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .right{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    select, input[type=text]{padding:10px 12px;border:1px solid #e7e7e7;border-radius:10px}
+    .actions .btn{padding:8px 12px}
+    .star{font-size:18px;cursor:pointer}
+    .star.on{color:#ffb703}
+    dialog{border:0;border-radius:12px;max-width:640px;width:95%;padding:0;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    dialog header{padding:14px 16px;border-bottom:1px solid #eee}
+    dialog main{padding:14px 16px;max-height:50vh;overflow:auto}
+    dialog footer{padding:12px 16px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end}
+    textarea{width:100%;min-height:90px;padding:10px;border:1px solid #e7e7e7;border-radius:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Área da Tutora</h1>
+        <div id="meNome" class="muted">Carregando...</div>
+        <div id="meEmail" class="muted"></div>
+      </div>
+      <div class="row">
+        <button id="btnLogout" class="btn ghost" type="button">Sair</button>
+        <a href="login.html" class="btn ghost">Tela inicial</a>
+      </div>
+    </div>
+
+    <div class="card" aria-labelledby="sec-espec-title">
+      <h3 id="sec-espec-title">Minhas especialidades</h3>
+      <p class="muted">Ex.: JavaScript, React...</p>
+      <div class="row">
+        <label for="inpEspec" class="visually-hidden">Especialidades</label>
+        <input id="inpEspec" type="text" placeholder="Digite as especialidades" style="flex:1" autocomplete="off">
+        <button id="btnSalvar" class="btn" type="button">Salvar</button>
+      </div>
+      <div id="chips" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card" aria-labelledby="sec-lista-title">
+      <div class="top">
+        <h3 id="sec-lista-title">Alunas compatíveis</h3>
+        <div class="right">
+          <label for="selCategoria" class="muted">Categoria:</label>
+          <select id="selCategoria">
+            <option value="todas">Todas</option>
+            <option>Desenvolvimento e Programação</option>
+            <option>Infraestrutura e Redes</option>
+            <option>Segurança da Informação (Cybersecurity)</option>
+            <option>Dados e Inteligência Artificial</option>
+            <option>Design e Experiência do Usuário</option>
+            <option>Gestão e Produto</option>
+            <option>Suporte e Atendimento</option>
+            <option>Outras áreas emergentes</option>
+          </select>
+
+          <label for="chkFavOnly" class="muted" style="display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="chkFavOnly"> Apenas Favoritos
+          </label>
+        </div>
+      </div>
+      <div id="hint" class="muted" style="margin:4px 0 10px"></div>
+      <div id="alunas" class="list"></div>
+    </div>
+  </div>
+
+  <dialog id="dlgMsg" aria-labelledby="dlgTitle">
+    <header>
+      <strong id="dlgTitle">Mensagem</strong>
+    </header>
+    <main>
+      <div id="dlgHist" class="muted">Carregando…</div>
+      <label for="dlgText" class="visually-hidden">Texto da mensagem</label>
+      <textarea id="dlgText" placeholder="Escreva sua mensagem…"></textarea>
+    </main>
+    <footer>
+      <button id="dlgClose" class="btn ghost" type="button">Fechar</button>
+      <button id="dlgSend" class="btn" type="button">Enviar</button>
+    </footer>
+  </dialog>
+
+  <script type="module" src="tutora.js"></script>
+</body>
+</html>
