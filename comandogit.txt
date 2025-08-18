@@ -1,0 +1,3 @@
+git add . (ADICIONA MUDANÇAS)
+git commit -m "atualização" (SALVA AS MUDANÇAS)
+git push (ENVIA PRO GITHUB)
