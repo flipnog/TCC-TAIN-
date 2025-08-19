@@ -229,15 +229,12 @@ async function openDialogMsg(estudanteId, estudanteNome){
   const tRef = doc(db, "matches", tid);
 
   try {
-    const tSnap = await getDoc(tRef);
-    if (!tSnap.exists()){
-      await setDoc(tRef, {
-        tutoraId: ME.uid,
-        estudanteId,
-        createdAt: serverTimestamp(),
-        status: "aberto"
-      }, { merge:true });
-    }
+    await setDoc(tRef, {
+      tutoraId: ME.uid,
+      estudanteId,
+      createdAt: serverTimestamp(),
+      status: "aberto"
+    }, { merge: true });
 
     const msgsCol = collection(db, "matches", tid, "mensagens");
     const msgsQ = query(msgsCol, orderBy("createdAt","asc"), limit(50));
@@ -250,11 +247,13 @@ async function openDialogMsg(estudanteId, estudanteNome){
       mSnap.forEach(m=>{
         const d = m.data();
         const eu = d.from === ME.uid;
-        const when = d.createdAt?.seconds ? new Date(d.createdAt.seconds*1000) : new Date();
+        const when = d.createdAt?.seconds
+          ? new Date(d.createdAt.seconds*1000)
+          : new Date();
         html.push(
           `<div style="margin:6px 0; display:flex; ${eu?'justify-content:flex-end':''}">
             <div style="max-width:75%; padding:8px 12px; border-radius:10px; ${eu?'background:#ffe3f1':'background:#f5f5f5'}">
-              <div style="font-size:.85rem;${eu?'text-align:right':''}">${d.text||''}</div>
+              <div style="font-size:.85rem;${eu?'text-align:right':''}">${(d.text||'').replace(/\n/g,'<br>')}</div>
               <div class="muted" style="font-size:.75rem; ${eu?'text-align:right':''}">${when.toLocaleString()}</div>
             </div>
           </div>`
@@ -277,7 +276,8 @@ async function openDialogMsg(estudanteId, estudanteNome){
         createdAt: serverTimestamp()
       });
       dlgText.value = "";
-      await openDialogMsg(estudanteId, estudanteNome); // recarrega histórico
+
+      await openDialogMsg(estudanteId, estudanteNome);
     }catch(e){
       alert("Erro ao enviar mensagem: " + (e.code || e.message));
     }
