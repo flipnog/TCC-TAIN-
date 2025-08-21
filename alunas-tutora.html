@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls — Tutora (Alunas)</title>
+  <link rel="stylesheet" href="alunas-tutora.css"/>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-row">
+      <div class="brand">TECH RUN GIRLS</div>
+      <nav class="menu" id="menu">
+        <a href="tutora.html">Dashboard</a>
+        <a href="perfil-tutora.html">Perfil</a>
+        <a href="alunas-tutora.html" class="active">Alunas</a>
+        <a href="mensagens-tutora.html">Mensagens</a>
+        <button id="btnLogout" class="btn ghost" type="button">Sair</button>
+      </nav>
+      <button id="btnHamb" class="hamb" aria-label="Abrir menu">☰</button>
+    </div>
+    <div id="drawer" class="drawer">
+      <a href="tutora.html">Dashboard</a>
+      <a href="perfil-tutora.html">Perfil</a>
+      <a href="alunas-tutora.html" class="active">Alunas</a>
+      <a href="mensagens-tutora.html">Mensagens</a>
+      <button id="btnLogout2" class="btn ghost" style="width:100%" type="button">Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card page-top">
+      <div>
+        <h1 class="title">Alunas</h1>
+        <p class="muted" id="meInfo">Carregando…</p>
+      </div>
+      <div class="filters">
+        <input id="txtBusca" class="input" type="text" placeholder="Buscar por nome ou e-mail"/>
+        <select id="selCategoria" class="input">
+          <option value="todas">Todas as categorias</option>
+          <option>Desenvolvimento e Programação</option>
+          <option>Infraestrutura e Redes</option>
+          <option>Segurança da Informação (Cybersecurity)</option>
+          <option>Dados e Inteligência Artificial</option>
+          <option>Design e Experiência do Usuário</option>
+          <option>Gestão e Produto</option>
+          <option>Suporte e Atendimento</option>
+          <option>Outras áreas emergentes</option>
+        </select>
+        <select id="selStatus" class="input">
+          <option value="todos">Todos os status</option>
+          <option value="acompanhando">Acompanhando</option>
+          <option value="mais_tarde">Mais tarde</option>
+          <option value="rejeitado">Rejeitadas</option>
+        </select>
+        <label class="chk">
+          <input type="checkbox" id="chkFavOnly"> Apenas Favoritos
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div id="hint" class="muted" style="margin-bottom:10px"></div>
+      <div id="alunas" class="list"></div>
+    </section>
+  </main>
+
+  <dialog id="dlgMsg" aria-labelledby="dlgTitle">
+    <header class="dlg-header">
+      <strong id="dlgTitle">Mensagem</strong>
+    </header>
+    <main class="dlg-main">
+      <div id="dlgHist" class="muted">Carregando…</div>
+      <textarea id="dlgText" class="textarea" placeholder="Escreva sua mensagem…"></textarea>
+    </main>
+    <footer class="dlg-footer">
+      <button id="dlgClose" class="btn ghost" type="button">Fechar</button>
+      <button id="dlgSend" class="btn" type="button">Enviar</button>
+    </footer>
+  </dialog>
+
+  <dialog id="dlgPerfil" aria-labelledby="dlgPerfilTitle">
+    <header class="dlg-header">
+      <strong id="dlgPerfilTitle">Perfil da aluna</strong>
+    </header>
+    <main class="dlg-main" id="dlgPerfilBody">Carregando…</main>
+    <footer class="dlg-footer">
+      <button class="btn ghost" id="dlgPerfilClose" type="button">Fechar</button>
+    </footer>
+  </dialog>
+
+  <script type="module">
+    import { auth } from "./firebase-config.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    const drawer = document.getElementById("drawer");
+    document.getElementById("btnHamb")?.addEventListener("click", ()=> drawer?.classList.toggle("show"));
+    const doLogout = async ()=>{ try{ await signOut(auth); window.location.href="login.html"; }catch(e){ alert(e.message);} };
+    document.getElementById("btnLogout")?.addEventListener("click", doLogout);
+    document.getElementById("btnLogout2")?.addEventListener("click", doLogout);
+  </script>
+  <script type="module" src="alunas-tutora.js"></script>
+</body>
+</html>
