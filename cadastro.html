@@ -3,43 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tech Run Girls - Cadastro</title>
-  <link rel="stylesheet" href="login.css" />
-  <style>
-    .hidden{display:none}
-    .hint{font-size:.85rem;color:#666;margin-top:6px}
-    .readonly{background:#f7f7f7}
-  </style>
+  <title>Tech Run Girls — Cadastro</title>
+  <link rel="stylesheet" href="cadastro.css" />
 </head>
 <body>
-  <div class="login-container">
-    <h1 id="titulo">Cadastro</h1>
-    <p class="subtitle" id="subtitulo">Junte-se ao TECH RUN GIRLS</p>
+  <div class="wrap">
+    <div class="card">
+      <header class="head">
+        <h1 id="titulo">Crie sua conta</h1>
+        <p id="subtitulo" class="muted">Junte-se ao <strong>TECH RUN GIRLS</strong></p>
+      </header>
 
-    <input type="text" id="nome" placeholder="Digite seu nome" required>
-    <input type="email" id="email" placeholder="Digite seu e-mail" required>
+      <div class="grid">
+        <div class="col">
+          <label class="lbl" for="nome">Nome completo</label>
+          <input class="inp" type="text" id="nome" placeholder="Digite seu nome" required>
+        </div>
 
-    <input type="tel" id="contato" placeholder="Contato">
+        <div class="col">
+          <label class="lbl" for="email">E-mail</label>
+          <input class="inp" type="email" id="email" placeholder="Digite seu e-mail" required>
+        </div>
 
-    <div id="rowSenha">
-      <input type="password" id="password" placeholder="Crie uma senha" required>
+        <div class="col">
+          <label class="lbl" for="contato">Contato</label>
+          <input class="inp" type="tel" id="contato" placeholder="Ex.: (11) 99999-0000...">
+        </div>
+
+        <div class="col" id="rowSenha">
+          <label class="lbl" for="password">Senha</label>
+          <input class="inp" type="password" id="password" placeholder="Crie uma senha" required>
+        </div>
+
+        <div class="col">
+          <label class="lbl" for="tipo">Sou</label>
+          <select class="inp" id="tipo" required>
+            <option value="">Selecione...</option>
+            <option value="estudante">Estudante</option>
+            <option value="tutora">Tutora</option>
+          </select>
+        </div>
+
+        <div class="col col-full hidden" id="box-espec">
+          <label class="lbl" for="especialidades">
+            Especialidades <span class="tag">apenas tutora</span>
+          </label>
+          <input class="inp" id="especialidades" placeholder="Ex.: JavaScript, Python...">
+          <div class="hint">Separe por vírgulas — usamos isso para recomendar você às alunas.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="cadastroBtn" class="btn">Cadastrar</button>
+        <p class="muted small">
+          Já tem conta? <a href="login.html">Faça login</a>
+        </p>
+      </div>
     </div>
-
-    <label for="tipo">Sou:</label>
-    <select id="tipo" required>
-      <option value="">Selecione...</option>
-      <option value="estudante">Estudante</option>
-      <option value="tutora">Tutora</option>
-    </select>
-
-    <div id="box-espec" class="hidden" style="margin-top:10px;text-align:left">
-      <label for="especialidades"><strong>Especialidades (apenas tutora)</strong></label>
-      <input id="especialidades" placeholder="Ex.: JavaScript, Python, DevOps, SQL, UX/UI">
-      <div class="hint">Separe por vírgulas. Usaremos isso para recomendar você às alunas.</div>
-    </div>
-
-    <button id="cadastroBtn">Cadastrar</button>
-    <p class="register-link">Já tem conta? <a href="login.html">Faça login</a></p>
   </div>
 
   <script type="module" src="cadastro.js"></script>

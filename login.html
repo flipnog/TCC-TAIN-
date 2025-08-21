@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tech Run Girls - Login</title>
-  <link rel="stylesheet" href="login.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls — Login</title>
+  <link rel="stylesheet" href="login.css"/>
 </head>
 <body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <h1>TECH RUN GIRLS</h1>
+      <p class="subtitle">Conectando mulheres à tecnologia</p>
 
-<div class="login-container">
-  <h1>TECH RUN GIRLS</h1>
-  <p class="subtitle">Conectando mulheres à tecnologia</p>
+      <input type="email" id="email" placeholder="Seu e-mail" autocomplete="email" required>
+      <input type="password" id="password" placeholder="Sua senha" autocomplete="current-password" required>
 
-  <input type="email" id="email" placeholder="Digite seu e-mail" required>
-  <input type="password" id="password" placeholder="Digite sua senha" required>
+      <button id="loginBtn" class="btn">Entrar</button>
+      <button id="googleBtn" class="btn ghost">Entrar com Google</button>
 
-  <button id="loginBtn">Entrar</button>
-  <button id="googleBtn" class="google-btn">Entrar com Google</button>
+      <p class="tiny">
+        Não tem conta? <a href="cadastro.html">Cadastre-se</a>
+      </p>
+    </div>
+  </div>
 
-  <p class="register-link">Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
-</div>
-
-<script type="module" src="login.js"></script>
-
+  <script type="module" src="login.js"></script>
 </body>
 </html>

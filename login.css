@@ -1,60 +1,31 @@
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #ff66b2, #ff99cc);
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+:root{
+  --brand:#ff3399; --brand-700:#e62e8b;
+  --ink:#222; --muted:#666; --bg:#fff;
+  --radius:16px; --shadow:0 8px 24px rgba(0,0,0,.12);
 }
-
-.login-container {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  text-align: center;
-  width: 300px;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(135deg,#ff66b2,#ff99cc);
 }
-
-.login-container h1 {
-  color: #ff3399;
+.login-wrap{min-height:100%; display:grid; place-items:center; padding:20px}
+.login-card{
+  width:min(420px,92vw); background:var(--bg); border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:28px; text-align:center;
 }
-
-.subtitle {
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-  color: #555;
+h1{margin:0 0 4px; color:var(--brand)}
+.subtitle{margin:0 0 18px; color:var(--muted)}
+input{
+  width:100%; padding:14px 12px; border:1px solid #e7e7e7; border-radius:12px; margin:8px 0;
 }
-
-input {
-  width: 90%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+.btn{
+  width:100%; padding:14px; border-radius:12px; border:0; font-weight:700; cursor:pointer;
+  background:var(--brand); color:#fff; margin-top:10px;
 }
-
-button {
-  background-color: #ff3399;
-  color: white;
-  padding: 10px;
-  border: none;
-  width: 100%;
-  margin-top: 10px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-button:hover {
-  background-color: #e62e8b;
-}
-
-.google-btn {
-  background-color: #4285F4;
-}
-
-.register-link {
-  margin-top: 15px;
-  font-size: 0.85rem;
-}
+.btn:hover{background:var(--brand-700)}
+.btn.ghost{background:#fff; color:var(--ink); border:2px solid #ff66b2}
+.tiny{color:var(--muted); font-size:.95rem; margin-top:10px}
+a{color:var(--brand); text-decoration:none}
+a:hover{text-decoration:underline}

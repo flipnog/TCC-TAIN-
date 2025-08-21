@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls — Trilha</title>
+
+  <link rel="stylesheet" href="inicio.css"/>
+  <link rel="stylesheet" href="trilha.css"/>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-row">
+      <div class="brand">TECH RUN GIRLS</div>
+      <nav class="menu" id="menu">
+        <a href="inicio.html">Início</a>
+        <a href="perfil.html">Perfil</a>
+        <a href="resultado.html" class="link-resultado">Resultado</a>
+        <a href="trilha.html" class="active">Trilha</a>
+        <a href="mensagens.html">Mensagens</a>
+        <button id="btnLogout" class="btn ghost" type="button">Sair</button>
+      </nav>
+      <button id="btnHamb" class="hamb" aria-label="Abrir menu">☰</button>
+    </div>
+    <div id="drawer" class="drawer">
+      <a href="inicio.html">Início</a>
+      <a href="perfil.html">Perfil</a>
+      <a href="resultado.html" class="link-resultado">Resultado</a>
+      <a href="trilha.html" class="active">Trilha</a>
+      <a href="mensagens.html">Mensagens</a>
+      <button id="btnLogout2" class="btn ghost" style="width:100%" type="button">Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card page-top">
+      <h1 class="title">Minha trilha</h1>
+      <p class="muted">Seu passo a passo de estudos e prática.</p>
+    </section>
+
+    <section id="emptyState" class="card empty" style="display:none">
+      <h2>Resolva o formulário para receber seu passo a passo</h2>
+      <p class="muted">Assim que você terminar o questionário, vamos montar sua trilha personalizada.</p>
+      <div class="cta-row">
+        <a class="btn" href="formulario.html">Ir para o formulário</a>
+      </div>
+
+      &nbsp;<h3 style="margin-top:14px">Canais para começar já</h3>
+      <div class="channels">
+        <a class="channel" href="https://www.youtube.com/c/CursoemV%C3%ADdeo" target="_blank" rel="noopener">
+          <div class="channel-logo">
+            <img src="canais/cursoemvideo.png" alt="Logo Curso em Vídeo">
+          </div>
+          <div class="channel-meta">
+            <strong>Curso em Vídeo</strong>
+            <span class="muted">Gustavo Guanabara</span>
+          </div>
+        </a>
+        <a class="channel" href="https://www.youtube.com/@rafaballerini" target="_blank" rel="noopener">
+          <div class="channel-logo">
+            <img src="canais/ballerini.png" alt="Logo Rafaella Ballerini">
+          </div>
+          <div class="channel-meta">
+            <strong>Rafaella Ballerini</strong>
+            <span class="muted">RB Tech/Front-end</span>
+          </div>
+        </a>
+        <a class="channel" href="https://www.youtube.com/@Alura" target="_blank" rel="noopener">
+          <div class="channel-logo">
+            <img src="canais/alura.png" alt="Logo Alura">
+          </div>
+          <div class="channel-meta">
+            <strong>Alura</strong>
+            <span class="muted">Tecnologia e carreira</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section id="trailWrap" class="grid-trilha" style="display:none">
+      <article class="card summary">
+        <h2 id="catTitle">—</h2>
+        <p id="roleTitle" class="muted">—</p>
+
+        <div class="progress">
+          <span id="pbar" style="width:0%"></span>
+        </div>
+        <p class="muted" id="ptext">0% concluído</p>
+      </article>
+
+      <section class="card tasks">
+        <h3>Passo a passo</h3>
+        <div id="taskList" class="task-list">
+        </div>
+        <p id="saveHint" class="muted" style="display:none">Salvando…</p>
+        <p id="errorHint" class="muted" style="display:none;color:#d00">Não foi possível salvar. Verifique sua conexão e as regras do Firestore.</p>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="trilha.js"></script>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const drawer = document.getElementById("drawer");
+    document.getElementById("btnHamb")?.addEventListener("click", ()=> drawer?.classList.toggle("show"));
+
+    const doLogout = async ()=>{ try{ await signOut(auth); window.location.href="login.html"; }catch(e){ alert(e.message);} };
+    document.getElementById("btnLogout")?.addEventListener("click", doLogout);
+    document.getElementById("btnLogout2")?.addEventListener("click", doLogout);
+
+    onAuthStateChanged(auth, async (user)=>{
+      if (!user) { window.location.href="login.html"; return; }
+      try{
+        const snap = await getDoc(doc(db,"usuarios",user.uid));
+        const u = snap.exists() ? snap.data() : {};
+        const finished = (u.questionarioFinalizado === true) ||
+                         ((u.questionario?.topTags || []).length > 0);
+        document.querySelectorAll(".link-resultado").forEach(a=>{
+          a.addEventListener("click",(e)=>{
+            e.preventDefault();
+            window.location.href = finished ? "resultado.html" : "formulario.html";
+          });
+        });
+      }catch(_){}
+    });
+  </script>
+</body>
+</html>

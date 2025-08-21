@@ -3,43 +3,98 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tech Run Girls - Resultado</title>
-  <link rel="stylesheet" href="login.css"/>
-  <style>
-    .wrap { text-align:left }
-    .pill { display:inline-block; padding:4px 10px; border-radius:999px; background:#ffe3f1; margin:4px; font-size:.85rem; }
-    .list { margin-top:12px; }
-    .tutora { padding:10px; border:1px solid #eee; border-radius:8px; margin:8px 0; }
-    .muted { font-size:.88rem; color:#666 }
-  </style>
+  <title>Tech Run Girls — Resultado</title>
+
+  <link rel="stylesheet" href="inicio.css"/>
+  <link rel="stylesheet" href="resultado.css"/>
 </head>
 <body>
-
-  <div class="login-container wrap">
-    <h1>Seu Resultado</h1>
-    <p class="subtitle">Categoria e papel sugeridos com próximos passos</p>
-
-    <h2 id="categoria">Carregando…</h2>
-    <h3 id="papel" style="margin-top:0.25rem;"></h3>
-
-    <div class="list">
-      <h3>Trilha sugerida</h3>
-      <ul id="trilha"></ul>
+  <header class="nav">
+    <div class="container nav-row">
+      <div class="brand">TECH RUN GIRLS</div>
+      <nav class="menu" id="menu">
+        <a href="inicio.html">Início</a>
+        <a href="perfil.html">Perfil</a>
+        <a href="resultado.html" class="active link-resultado">Resultado</a>
+        <a href="trilha.html">Trilha</a>
+        <a href="mensagens.html">Mensagens</a>
+        <button id="btnLogout" class="btn ghost" type="button">Sair</button>
+      </nav>
+      <button id="btnHamb" class="hamb" aria-label="Abrir menu">☰</button>
     </div>
-
-    <div class="list">
-      <h3>Tutoras recomendadas</h3>
-      <div id="tutoras"></div>
-      <p id="hint" class="muted"></p>
+    <div id="drawer" class="drawer">
+      <a href="inicio.html">Início</a>
+      <a href="perfil.html">Perfil</a>
+      <a href="resultado.html" class="active link-resultado">Resultado</a>
+      <a href="trilha.html">Trilha</a>
+      <a href="mensagens.html">Mensagens</a>
+      <button id="btnLogout2" class="btn ghost" style="width:100%" type="button">Sair</button>
     </div>
+  </header>
 
-    <div style="margin-top:16px">
-      <a class="btn" href="mensagens.html">Mensagens</a>
-      <a class="pill" href="formulario.html">Refazer teste</a>
-      <a class="pill" href="login.html">Sair</a>
-    </div>
-  </div>
+  <main class="container">
+    <section class="card page-top">
+      <h1 class="title">Seu Resultado</h1>
+      <p class="muted">Categoria e papel sugeridos com próximos passos</p>
+    </section>
+
+    <section class="grid-resultado">
+      <article class="card result-card">
+        <h2 id="categoria">Carregando…</h2>
+        <h3 id="papel" class="papel"></h3>
+
+        <div class="cta-row">
+          <a class="btn" href="mensagens.html">Abrir mensagens</a>
+          <a class="btn ghost" id="btnRefazer" href="formulario.html?refazer=1">Refazer teste</a>
+        </div>
+      </article>
+
+      <article class="card result-card">
+        <h3>Trilha sugerida</h3>
+        <ul id="trilha" class="trilha-list"></ul>
+      </article>
+
+      <article class="card result-card">
+        <h3>Sua tutora</h3>
+        <div id="tutoraBox" class="tutora-box">
+          <p class="muted">Verificando atribuição de tutora…</p>
+        </div>
+        <p id="tutoraHint" class="muted"></p>
+      </article>
+    </section>
+  </main>
 
   <script type="module" src="resultado.js"></script>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const drawer = document.getElementById("drawer");
+    document.getElementById("btnHamb")?.addEventListener("click", ()=> drawer?.classList.toggle("show"));
+
+    const doLogout = async ()=>{ try{ await signOut(auth); window.location.href="login.html"; }catch(e){ alert(e.message);} };
+    document.getElementById("btnLogout")?.addEventListener("click", doLogout);
+    document.getElementById("btnLogout2")?.addEventListener("click", doLogout);
+
+    onAuthStateChanged(auth, async (user)=>{
+      if (!user) { window.location.href="login.html"; return; }
+      try{
+        const snap = await getDoc(doc(db,"usuarios",user.uid));
+        const u = snap.exists() ? snap.data() : {};
+        const finished = (u.questionarioFinalizado === true) ||
+                         ((u.questionario?.topTags || []).length > 0);
+        document.querySelectorAll(".link-resultado").forEach(a=>{
+          a.addEventListener("click",(e)=>{
+            if (!a.classList.contains("active")) {
+              e.preventDefault();
+              window.location.href = finished ? "resultado.html" : "formulario.html";
+            }
+          });
+        });
+      }catch(_){}
+    });
+  </script>
 </body>
 </html>

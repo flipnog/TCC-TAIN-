@@ -41,14 +41,6 @@ onAuthStateChanged(auth, async (user) => {
   const snap = await getDoc(ref);
   if (snap.exists()) {
     const u = snap.data();
-    if (u.tipo === "tutora") {
-      window.location.href = "tutora.html";
-      return;
-    }
-    if (u.tipo === "estudante") {
-      window.location.href = "formulario.html";
-      return;
-    }
     if (u.contato) inpContato.value = u.contato;
     if (Array.isArray(u.especialidades) && u.especialidades.length) {
       tipoSel.value = "tutora";
@@ -59,30 +51,21 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 btn.addEventListener("click", async () => {
-  const nome   = inpNome.value.trim();
-  const email  = inpEmail.value.trim();
-  const senha  = (inpSenha?.value || "").trim();
-  const tipo   = tipoSel.value;
-  const contato= (inpContato?.value || "").trim();
+  const nome     = inpNome.value.trim();
+  const email    = inpEmail.value.trim();
+  const senha    = (inpSenha?.value || "").trim();
+  const tipo     = tipoSel.value;
+  const contato  = (inpContato?.value || "").trim();
   const especStr = (inpEspec?.value || "").trim();
 
-  // validações
-  if (!nome || !email || !tipo) {
-    alert("Preencha nome, e-mail e selecione o tipo.");
-    return;
-  }
-  if (!modoCompletar && !senha) {
-    alert("Crie uma senha.");
-    return;
-  }
+  if (!nome || !email || !tipo) { alert("Preencha nome, e-mail e selecione o tipo."); return; }
+  if (!modoCompletar && !senha) { alert("Crie uma senha."); return; }
 
   try {
     let uid;
     if (modoCompletar) {
-      // Já autenticada (ex.: Google) — só salva/atualiza doc
       uid = auth.currentUser.uid;
     } else {
-      // Cadastro tradicional
       const cred = await createUserWithEmailAndPassword(auth, email, senha);
       uid = cred.user.uid;
     }
@@ -93,23 +76,15 @@ btn.addEventListener("click", async () => {
     }
 
     await setDoc(doc(db, "usuarios", uid), {
-      nome,
-      email,
-      tipo,
-      contato,
-      especialidades,
+      nome, email, tipo, contato, especialidades,
       atualizadoEm: new Date(),
-      ...(modoCompletar ? { criadoEm: new Date() } : { criadoEm: new Date() })
+      ...(modoCompletar ? {} : { criadoEm: new Date() })
     }, { merge: true });
 
     alert(modoCompletar ? "Perfil salvo!" : "Cadastro realizado com sucesso!");
+    window.location.href = "inicio.html";
 
-    if (tipo === "tutora") {
-      window.location.href = "dashboard_tutora.html";
-    } else {
-      window.location.href = "formulario.html";
-    }
   } catch (error) {
-    alert("Erro no cadastro: " + error.message);
+    alert("Erro no cadastro: " + (error.code || error.message));
   }
 });

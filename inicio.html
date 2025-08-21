@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls — Início</title>
+  <link rel="stylesheet" href="inicio.css"/>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-row">
+      <div class="brand">TECH RUN GIRLS</div>
+      <nav class="menu" id="menu">
+        <a href="inicio.html" class="active">Início</a>
+        <a href="perfil.html">Perfil</a>
+        <a href="resultado.html" class="link-resultado">Resultado</a>
+        <a href="trilha.html">Trilha</a>
+        <a href="mensagens.html">Mensagens</a>
+        <button id="btnLogout" class="btn ghost">Sair</button>
+      </nav>
+      <button id="btnHamb" class="hamb">☰</button>
+    </div>
+    <div id="drawer" class="drawer">
+      <a href="inicio.html" class="active">Início</a>
+      <a href="perfil.html">Perfil</a>
+      <a href="resultado.html" class="link-resultado">Resultado</a>
+      <a href="trilha.html">Trilha</a>
+      <a href="mensagens.html">Mensagens</a>
+      <button id="btnLogout2" class="btn ghost" style="width:100%">Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card page-top">
+      <h2 class="title">
+        Bem-vinda, <span id="nome">…</span> 
+        <span id="categoria" class="badge"></span>
+      </h2>
+      <p class="muted" id="intro">Carregando…</p>
+    </section>
+
+    <section class="grid">
+      <div class="card mini card-dashboard">
+        <strong>Resultado - Formulário</strong>
+        <p class="muted" id="resumoRes">—</p>
+        <div class="card-actions">
+          <a class="btn link-resultado" href="resultado.html">Ver resultado</a>
+        </div>
+      </div>
+
+      <div class="card mini card-dashboard">
+        <strong>Minha trilha</strong>
+        <div class="progress"><span id="pbar" style="width:0%"></span></div>
+        <div class="card-actions">
+          <a class="btn" href="trilha.html">Abrir trilha</a>
+        </div>
+      </div>
+
+      <div class="card mini card-dashboard">
+        <strong>Mensagens</strong>
+        <p class="muted">Converse com tutoras.</p>
+        <div class="card-actions">
+          <a class="btn" href="mensagens.html">Abrir mensagens</a>
+        </div>
+      </div>
+    </section>
+
+    <div id="noredirectHint" class="muted" style="margin-top:8px;display:none">
+      Dica: você abriu com <code>?noredirect=1</code>, então não redirecionamos automaticamente.
+    </div>
+  </main>
+
+  <script type="module" src="inicio.js"></script>
+</body>
+</html>

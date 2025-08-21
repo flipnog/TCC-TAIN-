@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 function canRedoFromUrl(){
@@ -95,7 +95,7 @@ const ROLES = {
 const bump = (obj, keys, val = 2) => { keys.forEach(k => obj[k] = (obj[k] || 0) + val); return obj; };
 
 const PERGUNTAS = [
-  { id:"Q1",  enunciado:"Qual grande área de tecnologia mais combina com você agora?", opcoes:[
+  { id:"Q1",  enunciado:"1- Qual grande área de tecnologia mais combina com você agora?", opcoes:[
     { t:"Desenvolvimento e Programação", w:bump({},["software","frontend","backend"],1) },
     { t:"Infraestrutura e Redes", w:bump({},["networks","sysadmin","devops","cloud"],1) },
     { t:"Segurança da Informação (Cyber)", w:bump({},["security"],2) },
@@ -105,7 +105,7 @@ const PERGUNTAS = [
     { t:"Suporte e Atendimento", w:bump({},["helpdesk","servicedesk","erp"],1) },
     { t:"Outras áreas emergentes", w:bump({},["vrar","iot","blockchain","robotics","edge"],1) }
   ]},
-  { id:"Q2",  enunciado:"O que você quer construir principalmente?", opcoes:[
+  { id:"Q2",  enunciado:"2- O que você quer construir principalmente?", opcoes:[
     { t:"Interfaces web e experiências visuais", w:{ frontend:2, ui:1, webdesign:1 } },
     { t:"APIs, lógica de negócio e bancos de dados para web", w:{ backend:2, software:1 } },
     { t:"Ambos: interfaces e APIs na web", w:{ fullstack:2, frontend:1, backend:1 } },
@@ -114,66 +114,66 @@ const PERGUNTAS = [
     { t:"Software para microcontroladores/IoT", w:{ embedded:2, iot:1 } },
     { t:"Projetar sistemas complexos e arquitetura", w:{ software:2, backend:1 } }
   ]},
-  { id:"Q3",  enunciado:"No desenvolvimento web, você prefere...", opcoes:[
+  { id:"Q3",  enunciado:"3- No desenvolvimento web, você prefere...", opcoes:[
     { t:"Trabalhar com HTML/CSS, componentes visuais e acessibilidade", w:{ frontend:2, ui:1, webdesign:1 } },
     { t:"Programar lógica no front (estado, roteamento, chamadas a API)", w:{ frontend:2, software:1 } },
     { t:"Criar design systems e interfaces pixel-perfect", w:{ ui:2, frontend:1 } }
   ]},
-  { id:"Q4",  enunciado:"Dentro de Infra/Redes, o que mais te atrai?", opcoes:[
+  { id:"Q4",  enunciado:"4- Dentro de Infra/Redes, o que mais te atrai?", opcoes:[
     { t:"Redes (roteamento, switches, topologias, BGP/OSPF)", w:{ networks:2 } },
     { t:"Sistemas e servidores (Linux/Windows, automação)", w:{ sysadmin:2 } },
     { t:"Automação, CI/CD e cultura DevOps", w:{ devops:2, cloud:1 } },
     { t:"Arquiteturas e serviços em Cloud (AWS/Azure/GCP)", w:{ cloud:2 } }
   ]},
-  { id:"Q5",  enunciado:"Sobre Redes, seu foco seria mais...", opcoes:[
+  { id:"Q5",  enunciado:"5- Sobre Redes, seu foco seria mais...", opcoes:[
     { t:"Operação diária, configurações e suporte a sites", w:{ networks:2 } },
     { t:"Projetar/otimizar redes de grande porte e alta disponibilidade", w:{ networks:2, cloud:1 } }
   ]},
-  { id:"Q6",  enunciado:"Qual vertente de Segurança mais te interessa?", opcoes:[
+  { id:"Q6",  enunciado:"6- Qual vertente de Segurança mais te interessa?", opcoes:[
     { t:"Ofensiva: encontrar falhas (pentest/ethical hacking)", w:{ pentest:2, security:1 } },
     { t:"Defensiva/operacional: monitorar e proteger", w:{ security:2 } },
     { t:"Arquitetura de segurança e DevSecOps", w:{ seceng:2, security:1 } },
     { t:"Segurança de redes (firewalls, IDS/IPS, NAC)", w:{ netsec:2, security:1 } },
     { t:"Resposta a incidentes e forense", w:{ incident:2, security:1 } }
   ]},
-  { id:"Q7",  enunciado:"Em Dados/IA, você curte mais...", opcoes:[
+  { id:"Q7",  enunciado:"7- Em Dados/IA, você curte mais...", opcoes:[
     { t:"Estatística, modelagem e gerar insights", w:{ analytics:1, ml:1, data:1 } },
     { t:"Construir pipelines/infra para dados (ETL/ELT)", w:{ datapipeline:2, data:1 } },
     { t:"Dashboards e indicadores para o negócio", w:{ bi:2, analytics:1 } }
   ]},
-  { id:"Q8",  enunciado:"No lado de modelos, seu foco seria...", opcoes:[
+  { id:"Q8",  enunciado:"8- No lado de modelos, seu foco seria...", opcoes:[
     { t:"Explorar dados e criar modelos para responder perguntas do negócio", w:{ analytics:2, ml:1 } },
     { t:"Colocar modelos em produção e manter em escala", w:{ ml:2, data:1 } }
   ]},
-  { id:"Q9",  enunciado:"Para suporte a decisões, você prefere...", opcoes:[
+  { id:"Q9",  enunciado:"9- Para suporte a decisões, você prefere...", opcoes:[
     { t:"Analisar métricas, criar relatórios e painéis", w:{ analytics:2, bi:1 } },
     { t:"Modelagem analítica e plataformas de BI corporativo", w:{ bi:2, analytics:1 } }
   ]},
-  { id:"Q10", enunciado:"No Design de Produto, qual perfil descreve melhor você?", opcoes:[
+  { id:"Q10", enunciado:"10- No Design de Produto, qual perfil descreve melhor você?", opcoes:[
     { t:"UI: visual, componentes, tipografia e cores", w:{ ui:2, webdesign:1 } },
     { t:"UX: pesquisa, jornada, arquitetura da informação", w:{ ux:2 } },
     { t:"Produto: unir UX/UI com métricas e estratégia", w:{ productdesign:2 } },
     { t:"Web: layout de sites e estética visual", w:{ webdesign:2, ui:1 } }
   ]},
-  { id:"Q11", enunciado:"Você quer liderar como?", opcoes:[
+  { id:"Q11", enunciado:"11- Você quer liderar como?", opcoes:[
     { t:"Tecnicamente, guiando soluções e padrões", w:{ techlead:2, software:1 } },
     { t:"Produto: visão, descoberta e métricas", w:{ pm:2, po:1 } },
     { t:"Processos ágeis: facilitar e melhorar fluxo", w:{ scrum:2 } }
   ]},
-  { id:"Q12", enunciado:"No universo de produto, qual foco te move?", opcoes:[
+  { id:"Q12", enunciado:"12- No universo de produto, qual foco te move?", opcoes:[
     { t:"Definir estratégia e ciclo de vida", w:{ pm:2 } },
     { t:"Maximar valor no backlog e releases", w:{ po:2 } }
   ]},
-  { id:"Q13", enunciado:"Na operação, o que te empolga mais?", opcoes:[
+  { id:"Q13", enunciado:"13- Na operação, o que te empolga mais?", opcoes:[
     { t:"Scrum, facilitação e remoção de impedimentos", w:{ scrum:2 } },
     { t:"Planejamento de escopo, cronograma e riscos", w:{ project:2 } }
   ]},
-  { id:"Q14", enunciado:"No atendimento/ops, sua vocação é...", opcoes:[
+  { id:"Q14", enunciado:"14- No atendimento/ops, sua vocação é...", opcoes:[
     { t:"Atender e resolver problemas técnicos dos usuários", w:{ helpdesk:2 } },
     { t:"Gerir chamados, SLAs e relatórios", w:{ servicedesk:2 } },
     { t:"Administrar sistema ERP e apoiar áreas de negócio", w:{ erp:2 } }
   ]},
-  { id:"Q15", enunciado:"Em áreas emergentes, qual te chama mais?", opcoes:[
+  { id:"Q15", enunciado:"15- Em áreas emergentes, qual te chama mais?", opcoes:[
     { t:"VR/AR — experiências imersivas", w:{ vrar:2 } },
     { t:"IoT — dispositivos conectados", w:{ iot:2, embedded:1 } },
     { t:"Blockchain — web3 e contratos inteligentes", w:{ blockchain:2 } },
@@ -215,6 +215,7 @@ function renderStep() {
   `;
   btnBack.disabled = step === 0;
   btnNext.textContent = step === PERGUNTAS.length - 1 ? "Finalizar" : "Avançar";
+  formEl.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function captureCurrent() {
@@ -240,9 +241,8 @@ btnNext.addEventListener("click", async () => {
   step++; renderStep();
 });
 
-btnLogout.addEventListener("click", async () => {
-  try { await signOut(auth); window.location.href = "login.html"; }
-  catch (e) { alert("Não foi possível sair agora: " + e.message); }
+btnLogout.addEventListener("click", () => {
+  window.location.href = "inicio.html";
 });
 
 btnReset.addEventListener("click", () => { respostas.fill(null); step = 0; renderStep(); window.scrollTo({ top: 0, behavior: "smooth" }); });
@@ -321,6 +321,16 @@ onAuthStateChanged(auth, async (user) => {
       window.location.href = "resultado.html";
       return;
     }
+
+    const finished = (u.questionarioFinalizado === true) ||
+                     ((u.questionario?.topTags || []).length > 0);
+    const resultLinks = document.querySelectorAll(".link-resultado");
+    resultLinks.forEach(a=>{
+      a.addEventListener("click",(e)=>{
+        e.preventDefault();
+        window.location.href = finished ? "resultado.html" : "formulario.html";
+      });
+    });
   }
   renderStep();
 });
