@@ -27,11 +27,12 @@ const dlgPerfilBody = document.getElementById("dlgPerfilBody");
 const dlgPerfilClose = document.getElementById("dlgPerfilClose");
 
 let ME = null;
-let FAVORITOS = new Set();
-let STATUS = new Map();
+let FAVORITOS = new Set();         // Set<estudanteId>
+let STATUS = new Map();            // Map<estudanteId, 'acompanhando'|'mais_tarde'|'rejeitado'>
 
 function norm(s){ return (s||"").toString().toLowerCase().trim(); }
 
+// --- Helpers ---
 function buildContactLink(raw){
   const s = (raw||"").trim();
   if (!s) return null;
@@ -103,6 +104,7 @@ function scoreAluno(alunaTopTags=[], tutorTags=[]){
   return sc;
 }
 
+// Favoritos e status
 async function getFavoritosIds(tutoraId){
   const favCol = collection(db, "usuarios", tutoraId, "favoritos");
   const snap = await getDocs(favCol);
@@ -121,6 +123,7 @@ async function getStatusMap(tutoraId){
   return map;
 }
 
+// --- Matches helpers (mostrar tutora no resultado.html) ---
 function threadId(tutoraId, estudanteId){ return `${tutoraId}__${estudanteId}`; }
 
 async function openMatch(estudanteId){
@@ -138,6 +141,7 @@ async function closeMatch(estudanteId){
   try { await deleteDoc(doc(db, "matches", tid)); } catch(_) {}
 }
 
+// Carregar lista
 async function carregarAlunas(){
   alunasEl.innerHTML = "<p class='muted'>Carregando…</p>";
 
@@ -249,6 +253,7 @@ function renderLista(lista){
     alunasEl.appendChild(item);
   });
 
+  // favoritos
   alunasEl.querySelectorAll(".star").forEach(s=>{
     s.addEventListener("click", async ()=>{
       const id = s.getAttribute("data-id");
@@ -259,6 +264,7 @@ function renderLista(lista){
     });
   });
 
+  // mensagens & perfil
   alunasEl.querySelectorAll(".btnMsg").forEach(b=>{
     b.addEventListener("click", ()=> openDialogMsg(b.getAttribute("data-id"), b.getAttribute("data-name")));
   });
@@ -266,6 +272,7 @@ function renderLista(lista){
     b.addEventListener("click", ()=> openDialogPerfil(b.getAttribute("data-id"), b.getAttribute("data-name")));
   });
 
+  // decisões
   alunasEl.querySelectorAll(".btn-choice").forEach(btn=>{
     btn.addEventListener("click", async ()=>{
       const id = btn.getAttribute("data-id");
@@ -279,6 +286,7 @@ function renderLista(lista){
       await setDoc(doc(db,"usuarios",ME.uid,"alunas",id), { estudanteId:id, status, updatedAt:new Date() }, { merge:true });
       STATUS.set(id, status);
 
+      // Matches para a estudante ver a tutora em resultado.html
       if (status === "acompanhando") {
         await openMatch(id);
       } else {
@@ -289,6 +297,7 @@ function renderLista(lista){
     });
   });
 
+  // limpar status
   alunasEl.querySelectorAll(".btn-clear").forEach(btn=>{
     btn.addEventListener("click", async ()=>{
       const id = btn.getAttribute("data-id");
@@ -375,6 +384,7 @@ async function openDialogMsg(estudanteId, estudanteNome){
 }
 dlgClose?.addEventListener("click", ()=> dlg.close());
 
+// ----- Perfil (com avatar no canto) -----
 function fmtDate(iso){
   if (!iso) return "-";
   try{
@@ -390,6 +400,13 @@ function fmtGender(g){
   if (m==="masculino") return "Masculino";
   if (m==="outro") return "Outro";
   return g;
+}
+function initialsFromName(nome){
+  const n = (nome||"").trim();
+  if (!n) return "👤";
+  const parts = n.split(/\s+/).filter(Boolean);
+  const ini = (parts[0]?.[0]||"") + (parts[parts.length-1]?.[0]||"");
+  return ini.toUpperCase();
 }
 
 async function openDialogPerfil(estudanteId, estudanteNome){
@@ -414,10 +431,20 @@ async function openDialogPerfil(estudanteId, estudanteNome){
     ];
 
     const tags = (u.questionario?.topTags || []).map(t=>`<span class="pill">${t}</span>`).join(" ");
+
+    const avatarUrl = u.photoData || u.photoURL || null;
+    const initials  = initialsFromName(u.nome || `${u.firstName||""} ${u.lastName||""}`.trim());
+
     dlgPerfilBody.innerHTML = `
-      <div>
+      <div class="perfil-content">
         ${linhas.map(([k,v])=>`<div style="margin:.2rem 0"><strong>${k}:</strong> <span class="muted">${v}</span></div>`).join("")}
         <div style="margin-top:8px"><strong>Top tags:</strong> ${tags || '<span class="muted">—</span>'}</div>
+      </div>
+
+      <div class="perfil-avatar" aria-hidden="true">
+        ${avatarUrl
+          ? `<img src="${avatarUrl}" alt="">`
+          : `<div class="perfil-fallback">${initials}</div>`}
       </div>
     `;
   }catch(e){
@@ -426,9 +453,11 @@ async function openDialogPerfil(estudanteId, estudanteNome){
 }
 dlgPerfilClose?.addEventListener("click", ()=> dlgPerfil.close());
 
+// Filtros
 [selCategoria, selStatus, chkFavOnly].forEach(el=> el?.addEventListener("change", carregarAlunas));
 txtBusca?.addEventListener("input", ()=>{ clearTimeout(window.__t); window.__t = setTimeout(carregarAlunas, 300); });
 
+// Auth
 onAuthStateChanged(auth, async (user)=>{
   if (!user){ window.location.href = "login.html"; return; }
   const us = await getDoc(doc(db,"usuarios",user.uid));
