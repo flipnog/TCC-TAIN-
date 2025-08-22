@@ -14,7 +14,6 @@ body{
 
 .container{max-width:1080px;margin:0 auto;padding:0 16px}
 
-/* NAV */
 .nav{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #eee}
 .nav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0}
 .brand{font-weight:800}
@@ -39,21 +38,34 @@ body{
   .drawer a{border:1px solid #eee;border-radius:10px;padding:10px;text-decoration:none;color:#111}
 }
 
-/* LAYOUT */
+.card {
+  margin-bottom: 20px;
+}
+
 main{padding:32px 0 40px}
 .card{background:#fff;border:1px solid #eee;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
 .page-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin:24px 0 16px}
 .title{margin:0 0 4px}
-.card-title{margin:0 0 6px}
+.card-title{margin:0 0 6px;font-weight:700}
 .muted{color:var(--muted)}
 .flex-1{flex:1}
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 
-/* Inputs */
 .input{padding:10px 12px;border:1px solid #e7e7e7;border-radius:10px;background:#fff;font-size:1rem;min-height:40px}
 .chips{margin-top:10px}
 .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#ffe3f1;margin:4px 6px 0 0;font-size:.85rem}
 
-/* Acessibilidade */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:8px}
+.metric{border:1px solid #f0f0f0;border-radius:12px;padding:14px;background:#fff}
+.metric-val{font-size:1.8rem;font-weight:800}
+.metric-label{color:var(--muted)}
+
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card-aluna{border:1px solid #f0f0f0;border-radius:12px;padding:14px;background:#fff}
+.card-aluna .name{font-weight:700;margin:0}
+.card-aluna .muted{font-size:.92rem}
+.progress{height:10px;background:#ffe3f1;border-radius:999px;overflow:hidden;margin:.4rem 0 .25rem}
+.progress>span{display:block;height:100%;background:var(--brand)}
+
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 :focus-visible{outline:3px solid transparent;box-shadow:0 0 0 3px rgba(255,51,153,.35);border-radius:8px}

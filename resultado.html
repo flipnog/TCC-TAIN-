@@ -67,8 +67,9 @@
   <script type="module" src="resultado.js"></script>
 
   <script type="module">
-    import { auth, db } from "./firebase-config.js";
+    import { auth } from "./firebase-config.js";
     import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { db } from "./firebase-config.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const drawer = document.getElementById("drawer");

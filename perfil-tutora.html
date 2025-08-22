@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls — Tutora (Perfil)</title>
+
+  <link rel="stylesheet" href="tutora.css"/>
+  <link rel="stylesheet" href="perfil-tutora.css"/>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-row">
+      <div class="brand">TECH RUN GIRLS</div>
+      <nav class="menu" id="menu">
+        <a href="tutora.html">Dashboard</a>
+        <a href="perfil-tutora.html" class="active">Perfil</a>
+        <a href="alunas-tutora.html">Alunas</a>
+        <a href="mensagens-tutora.html">Mensagens</a>
+        <button id="btnLogout" class="btn ghost" type="button">Sair</button>
+      </nav>
+      <button id="btnHamb" class="hamb" aria-label="Abrir menu">☰</button>
+    </div>
+    <div id="drawer" class="drawer">
+      <a href="tutora.html">Dashboard</a>
+      <a href="perfil-tutora.html" class="active">Perfil</a>
+      <a href="alunas-tutora.html">Alunas</a>
+      <a href="mensagens-tutora.html">Mensagens</a>
+      <button id="btnLogout2" class="btn ghost" style="width:100%" type="button">Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card profile-card">
+      <h1 class="title">Meu perfil (Tutora)</h1>
+      <p class="muted">Conte um pouco sobre você e mantenha seus dados atualizados. A bio aparece para as alunas quando você as acompanha.</p>
+
+      <form id="formPerfil" class="profile-grid" autocomplete="off">
+        <!-- Avatar -->
+        <div class="avatar-col">
+          <div class="avatar-wrap">
+            <img id="avatarImg" alt="Foto de perfil" />
+            <div id="avatarFallback" class="avatar-fallback" aria-hidden="true">👩‍💻</div>
+          </div>
+          <div class="avatar-actions">
+            <label class="btn ghost file-btn">
+              Selecionar foto
+              <input id="fileFoto" type="file" accept="image/*" hidden>
+            </label>
+            <button id="btnRemoverFoto" class="btn ghost" type="button">Remover foto</button>
+          </div>
+          <small class="muted">PNG/JPG até ~2MB. (Dica: fotos quadradas ficam melhores)</small>
+        </div>
+
+        <!-- Dados -->
+        <div class="fields-col">
+          <div class="two">
+            <label>Nome
+              <input id="firstName" type="text" placeholder="Seu primeiro nome" required>
+            </label>
+            <label>Sobrenome
+              <input id="lastName" type="text" placeholder="Seu sobrenome" required>
+            </label>
+          </div>
+
+          <div class="two">
+            <label>E-mail
+              <input id="email" type="email" placeholder="Seu e-mail" readonly class="readonly">
+            </label>
+            <label>Data de nascimento
+              <input id="birthdate" type="date" max="9999-12-31">
+            </label>
+          </div>
+
+          <div class="two">
+            <label>Sexo (opcional)
+              <select id="gender">
+                <option value="">Prefiro não informar</option>
+                <option value="feminino">Feminino</option>
+                <option value="masculino">Masculino</option>
+                <option value="outro">Outro</option>
+              </select>
+            </label>
+            <label>CEP
+              <input id="cep" type="text" inputmode="numeric" maxlength="9" placeholder="00000-000">
+            </label>
+          </div>
+
+          <div class="two">
+            <label>Município
+              <input id="city" type="text" placeholder="Ex.: Belo Horizonte">
+            </label>
+            <label>UF
+              <input id="uf" type="text" placeholder="MG" maxlength="2">
+            </label>
+          </div>
+
+          <div class="two">
+            <label>Formação
+              <select id="education">
+                <option value="">Selecione…</option>
+                <option>Ensino Médio Incompleto</option>
+                <option>Ensino Médio Completo</option>
+                <option>Ensino Superior Incompleto</option>
+                <option>Ensino Superior Completo</option>
+                <option>Outro</option>
+              </select>
+            </label>
+            <label>Se “Outro”, qual?
+              <input id="educationOther" type="text" placeholder="Descreva sua formação">
+            </label>
+          </div>
+
+          <label>Contato preferido (WhatsApp, e-mail ou link)
+            <input id="contato" type="text" placeholder="+5531999999999 | seu@email | https://seulink">
+          </label>
+
+          <label>Sua bio (carreira, formação, áreas de interesse)
+            <textarea id="bio" class="textarea-bio" placeholder="Escreva aqui sua história, experiências, áreas em que pode ajudar, certificações, etc."></textarea>
+          </label>
+
+          <div class="actions">
+            <button id="btnCancelar" type="button" class="btn ghost">Cancelar</button>
+            <button id="btnSalvar" type="submit" class="btn">Salvar alterações</button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { auth } from "./firebase-config.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    const drawer = document.getElementById("drawer");
+    document.getElementById("btnHamb")?.addEventListener("click", ()=> drawer?.classList.toggle("show"));
+    const doLogout = async ()=>{ try{ await signOut(auth); window.location.href="login.html"; }catch(e){ alert(e.message);} };
+    document.getElementById("btnLogout")?.addEventListener("click", doLogout);
+    document.getElementById("btnLogout2")?.addEventListener("click", doLogout);
+  </script>
+  <script type="module" src="perfil-tutora.js"></script>
+</body>
+</html>

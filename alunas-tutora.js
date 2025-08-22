@@ -1,8 +1,8 @@
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  doc, getDoc, setDoc, collection, query, where, getDocs, getDocsFromServer, limit, orderBy,
-  addDoc, serverTimestamp
+  doc, getDoc, setDoc, collection, query, where, getDocs, limit, orderBy,
+  addDoc, serverTimestamp, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const meInfo = document.getElementById("meInfo");
@@ -31,7 +31,6 @@ let FAVORITOS = new Set();
 let STATUS = new Map();
 
 function norm(s){ return (s||"").toString().toLowerCase().trim(); }
-function splitEspecialidades(s){ return (s||"").split(",").map(x=>x.trim()).filter(Boolean); }
 
 function buildContactLink(raw){
   const s = (raw||"").trim();
@@ -47,7 +46,6 @@ function buildContactLink(raw){
   return null;
 }
 
-// mapeia especialidades -> tags (mesma lógica que no dashboard)
 function mapEspecialidadeToTags(espRaw){
   const e = norm(espRaw);
   const out = [];
@@ -109,11 +107,13 @@ async function getFavoritosIds(tutoraId){
   const favCol = collection(db, "usuarios", tutoraId, "favoritos");
   const snap = await getDocs(favCol);
   const setIds = new Set();
-  snap.forEach(docu=> setIds.add(docu.id));
+  snap.forEach(docu=>{
+    const data = docu.data();
+    if (!data.removed) setIds.add(docu.id);
+  });
   return setIds;
 }
 async function getStatusMap(tutoraId){
-  // subcoleção "alunas" com {status:'acompanhando'|'mais_tarde'|'rejeitado'}
   const stCol = collection(db, "usuarios", tutoraId, "alunas");
   const snap = await getDocs(stCol);
   const map = new Map();
@@ -121,10 +121,26 @@ async function getStatusMap(tutoraId){
   return map;
 }
 
+function threadId(tutoraId, estudanteId){ return `${tutoraId}__${estudanteId}`; }
+
+async function openMatch(estudanteId){
+  const tid = threadId(ME.uid, estudanteId);
+  await setDoc(doc(db, "matches", tid), {
+    tutoraId: ME.uid,
+    estudanteId,
+    status: "aberto",
+    createdAt: serverTimestamp()
+  }, { merge: true });
+}
+
+async function closeMatch(estudanteId){
+  const tid = threadId(ME.uid, estudanteId);
+  try { await deleteDoc(doc(db, "matches", tid)); } catch(_) {}
+}
+
 async function carregarAlunas(){
   alunasEl.innerHTML = "<p class='muted'>Carregando…</p>";
 
-  // pega minhas especialidades para ranking
   const meSnap = await getDoc(doc(db,"usuarios",ME.uid));
   const espec = meSnap.exists() ? (meSnap.data().especialidades || []) : [];
   const tutorTags = tagsFromEspecialidades(espec);
@@ -133,15 +149,13 @@ async function carregarAlunas(){
     ? "Ordenado por compatibilidade com suas especialidades."
     : "Dica: adicione suas especialidades no Dashboard para recomendações melhores.";
 
-  // Busca SEMPRE do servidor e evita índice composto (filtra em memória o questionarioFinalizado)
   const [res, favoritos, statusMap] = await Promise.all([
-    getDocsFromServer(
-      query(
-        collection(db, "usuarios"),
-        where("tipo", "==", "estudante"),
-        limit(300)
-      )
-    ),
+    getDocs(query(
+      collection(db, "usuarios"),
+      where("tipo", "==", "estudante"),
+      where("questionarioFinalizado", "==", true),
+      limit(300)
+    )),
     getFavoritosIds(ME.uid),
     getStatusMap(ME.uid)
   ]);
@@ -156,13 +170,9 @@ async function carregarAlunas(){
   const alunos = [];
   res.forEach(d=>{
     const u = d.data();
-
-    // garante que só entra quem finalizou o questionário
-    if (u.questionarioFinalizado !== true) return;
-
     if (filtroCat !== "todas" && u.categoriaSugerida !== filtroCat) return;
 
-    const st = STATUS.get(d.id); // undefined se sem decisão
+    const st = STATUS.get(d.id);
     if (filtroStatus !== "todos" && st !== filtroStatus) return;
 
     if (favOnly && !FAVORITOS.has(d.id)) return;
@@ -217,22 +227,28 @@ function renderLista(lista){
           <div class="muted" style="margin-top:4px">${a.categoriaSugerida || "-" } • ${a.papelSugerido || "-"}</div>
           <div style="margin-top:6px">${espec || '<span class="muted">Sem tags</span>'}</div>
         </div>
-        <div class="actions">
+
+        <!-- Ações principais -->
+        <div class="actions primary" style="margin-top:10px">
           <button class="btn ghost btnPerfil" data-id="${a.id}" data-name="${a.nome||'Estudante'}">Ver perfil</button>
           <button class="btn ghost btnMsg" data-id="${a.id}" data-name="${a.nome||'Estudante'}">Mensagens</button>
           ${contatoBtn}
-          <button class="btn" data-act="acomp" data-id="${a.id}">Acompanhar</button>
-          <button class="btn ghost" data-act="later" data-id="${a.id}">Mais tarde</button>
-          <button class="btn ghost" data-act="reject" data-id="${a.id}">Rejeitar</button>
           <span class="pill"><strong>Score:</strong> ${a._score}</span>
           <span class="star ${fav?'on':''}" title="Favoritar" data-id="${a.id}">${fav?'★':'☆'}</span>
+        </div>
+
+        <!-- Decisão -->
+        <div class="decision-group" style="margin-top:8px" role="group" aria-label="Decisão da tutora">
+          <button class="btn-choice ${st==='acompanhando'?'is-selected':''}" data-choice="acomp" data-id="${a.id}">Acompanhar</button>
+          <button class="btn-choice ${st==='mais_tarde'?'is-selected':''}" data-choice="later" data-id="${a.id}">Mais tarde</button>
+          <button class="btn-choice ${st==='rejeitado'?'is-selected':''}" data-choice="reject" data-id="${a.id}">Rejeitar</button>
+          <button class="btn link btn-clear" data-act="clear" data-id="${a.id}" title="Remover status">Limpar status</button>
         </div>
       </div>
     `;
     alunasEl.appendChild(item);
   });
 
-  // eventos
   alunasEl.querySelectorAll(".star").forEach(s=>{
     s.addEventListener("click", async ()=>{
       const id = s.getAttribute("data-id");
@@ -242,25 +258,48 @@ function renderLista(lista){
       if (nowFav) FAVORITOS.add(id); else FAVORITOS.delete(id);
     });
   });
+
   alunasEl.querySelectorAll(".btnMsg").forEach(b=>{
     b.addEventListener("click", ()=> openDialogMsg(b.getAttribute("data-id"), b.getAttribute("data-name")));
   });
   alunasEl.querySelectorAll(".btnPerfil").forEach(b=>{
     b.addEventListener("click", ()=> openDialogPerfil(b.getAttribute("data-id"), b.getAttribute("data-name")));
   });
-  alunasEl.querySelectorAll("[data-act]").forEach(btn=>{
+
+  alunasEl.querySelectorAll(".btn-choice").forEach(btn=>{
     btn.addEventListener("click", async ()=>{
       const id = btn.getAttribute("data-id");
-      const act = btn.getAttribute("data-act");
+      const choice = btn.getAttribute("data-choice");
       let status = null;
-      if (act==="acomp") status = "acompanhando";
-      if (act==="later") status = "mais_tarde";
-      if (act==="reject") status = "rejeitado";
+      if (choice==="acomp") status = "acompanhando";
+      if (choice==="later") status = "mais_tarde";
+      if (choice==="reject") status = "rejeitado";
       if (!status) return;
 
       await setDoc(doc(db,"usuarios",ME.uid,"alunas",id), { estudanteId:id, status, updatedAt:new Date() }, { merge:true });
       STATUS.set(id, status);
+
+      if (status === "acompanhando") {
+        await openMatch(id);
+      } else {
+        await closeMatch(id);
+      }
+
       await carregarAlunas();
+    });
+  });
+
+  alunasEl.querySelectorAll(".btn-clear").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const id = btn.getAttribute("data-id");
+      try{
+        await deleteDoc(doc(db,"usuarios",ME.uid,"alunas",id));
+        STATUS.delete(id);
+        await closeMatch(id);
+        await carregarAlunas();
+      }catch(e){
+        alert("Não foi possível limpar o status: " + (e.code || e.message));
+      }
     });
   });
 }
@@ -268,14 +307,12 @@ function renderLista(lista){
 async function toggleFavorito(tutoraId, estudanteId, on){
   const ref = doc(db, "usuarios", tutoraId, "favoritos", estudanteId);
   if (on){
-    await setDoc(ref, { estudanteId, createdAt: new Date() }, { merge:true });
+    await setDoc(ref, { estudanteId, createdAt: new Date(), removed: false }, { merge:true });
   } else {
-    // não usar delete para simplificar permissões — sobrescreve como removido
-    await setDoc(ref, { removed:true }, { merge:true });
+    try{ await deleteDoc(ref); }
+    catch{ await setDoc(ref, { removed:true }, { merge:true }); }
   }
 }
-
-function threadId(tutoraId, estudanteId){ return `${tutoraId}__${estudanteId}`; }
 
 async function openDialogMsg(estudanteId, estudanteNome){
   dlgTitle.textContent = `Mensagem para ${estudanteNome}`;
@@ -295,6 +332,7 @@ async function openDialogMsg(estudanteId, estudanteNome){
 
     const msgsQ = query(collection(db, "matches", tid, "mensagens"), orderBy("createdAt","asc"), limit(50));
     const mSnap = await getDocs(msgsQ);
+
     if (mSnap.empty){
       dlgHist.innerHTML = `<p class="muted">Sem mensagens ainda. Envie a primeira! 🙂</p>`;
     } else {
@@ -335,7 +373,24 @@ async function openDialogMsg(estudanteId, estudanteNome){
     }
   };
 }
-dlgClose.addEventListener("click", ()=> dlg.close());
+dlgClose?.addEventListener("click", ()=> dlg.close());
+
+function fmtDate(iso){
+  if (!iso) return "-";
+  try{
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString();
+  }catch{ return iso; }
+}
+function fmtGender(g){
+  if (!g) return "-";
+  const m = (g||"").toString().toLowerCase();
+  if (m==="feminino") return "Feminino";
+  if (m==="masculino") return "Masculino";
+  if (m==="outro") return "Outro";
+  return g;
+}
 
 async function openDialogPerfil(estudanteId, estudanteNome){
   dlgPerfilTitle.textContent = `Perfil — ${estudanteNome}`;
@@ -345,17 +400,19 @@ async function openDialogPerfil(estudanteId, estudanteNome){
     const s = await getDoc(doc(db,"usuarios",estudanteId));
     if (!s.exists()){ dlgPerfilBody.innerHTML = "<p class='muted'>Perfil não encontrado.</p>"; return; }
     const u = s.data();
+
     const linhas = [
       ["Nome", u.nome || "-"],
       ["E-mail", u.email || "-"],
-      ["Nascimento", u.nascimento || "-"],
-      ["Sexo", u.sexo || "-"],
-      ["Município", u.municipio || "-"],
-      ["UF", u.uf || "-"],
-      ["Formação", u.formacao || "-"],
+      ["Nascimento", fmtDate(u.birthdate)],
+      ["Sexo", fmtGender(u.gender)],
+      ["Município", u.city || "-"],
+      ["UF", (u.uf || "-").toString().toUpperCase()],
+      ["Formação", u.education ? (u.education === "Outro" && u.educationOther ? `Outro — ${u.educationOther}` : u.education) : "-"],
       ["Categoria sugerida", u.categoriaSugerida || "-"],
       ["Papel sugerido", u.papelSugerido || "-"]
     ];
+
     const tags = (u.questionario?.topTags || []).map(t=>`<span class="pill">${t}</span>`).join(" ");
     dlgPerfilBody.innerHTML = `
       <div>
@@ -367,19 +424,17 @@ async function openDialogPerfil(estudanteId, estudanteNome){
     dlgPerfilBody.innerHTML = "<p class='muted'>Não foi possível carregar o perfil.</p>";
   }
 }
-dlgPerfilClose.addEventListener("click", ()=> dlgPerfil.close());
+dlgPerfilClose?.addEventListener("click", ()=> dlgPerfil.close());
 
-// filtros
-[selCategoria, selStatus, chkFavOnly].forEach(el=> el.addEventListener("change", carregarAlunas));
-txtBusca.addEventListener("input", ()=>{ clearTimeout(window.__t); window.__t = setTimeout(carregarAlunas, 300); });
+[selCategoria, selStatus, chkFavOnly].forEach(el=> el?.addEventListener("change", carregarAlunas));
+txtBusca?.addEventListener("input", ()=>{ clearTimeout(window.__t); window.__t = setTimeout(carregarAlunas, 300); });
 
-// auth
 onAuthStateChanged(auth, async (user)=>{
   if (!user){ window.location.href = "login.html"; return; }
   const us = await getDoc(doc(db,"usuarios",user.uid));
   if (!us.exists()){ meInfo.textContent = "Usuária não encontrada."; return; }
   const me = us.data();
-  if (me.tipo !== "tutora"){ alert("Área exclusiva para Tutoras."); window.location.href="login.html"; return; }
+  if (me.tipo !== "tutora"){ alert("Área exclusiva para Tutoras."); window.location.href = "login.html"; return; }
   ME = { uid:user.uid, ...me };
   meInfo.textContent = `${me.nome || "Tutora"} • ${me.email || user.email || ""}`;
   await carregarAlunas();
