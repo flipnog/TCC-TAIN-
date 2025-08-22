@@ -2,7 +2,7 @@ import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   doc, getDocFromServer, setDoc, serverTimestamp,
-  collection, getDocs, getDoc
+  collection, getDocs, getDoc, query, where, limit, getDocsFromServer
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const emptyState = document.getElementById("emptyState");
@@ -34,6 +34,8 @@ const slug = (s)=> (s||"")
 
 let UID = null;
 let TASKS = [];
+let TUTORA_ID = null;           // tutora ativa (se houver)
+const FEEDBACK = new Map();      // itemId -> { text, updatedAt, tutoraId }
 
 onAuthStateChanged(auth, async (user)=>{
   if(!user){ window.location.href="login.html"; return; }
@@ -54,6 +56,9 @@ onAuthStateChanged(auth, async (user)=>{
   if(!finished){
     showEmpty(); return;
   }
+
+  // Descobre a tutora ativa — primeiro tenta no doc do usuário, senão consulta matches
+  TUTORA_ID = await descobrirTutoraAtiva(UID, u.tutoraId);
 
   const categoria = u.categoriaSugerida || "Desenvolvimento e Programação";
   const papel     = u.papelSugerido || "Trilha de estudos";
@@ -80,14 +85,14 @@ onAuthStateChanged(auth, async (user)=>{
       id: b.id,
       title: b.title,
       done: !!s.done,
-      studentNote: s.studentNote || "",
-      tutorNote: s.tutorNote || ""
-    }
+      studentNote: s.studentNote || ""
+    };
   });
 
-  renderTasks();
+  renderTasks();          // render com placeholders
   updateProgress();
 
+  // garante documentos base existentes
   baseItems.forEach(async (b)=>{
     if (!mapSaved.has(b.id)){
       try{
@@ -95,7 +100,6 @@ onAuthStateChanged(auth, async (user)=>{
           title: b.title,
           done: false,
           studentNote: "",
-          tutorNote: "",
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         }, { merge:true });
@@ -104,7 +108,65 @@ onAuthStateChanged(auth, async (user)=>{
       }
     }
   });
+
+  // carrega feedback da tutora (se existir) e atualiza a UI
+  if (TUTORA_ID){
+    await carregarFeedbackTutora(TUTORA_ID);
+    aplicarFeedbackNaUI();
+  }
 });
+
+async function descobrirTutoraAtiva(estudanteId, tutoraIdDoPerfil){
+  // 1) se já veio do perfil, ótimo
+  if (tutoraIdDoPerfil) return tutoraIdDoPerfil;
+
+  // 2) tenta achar um match aberto
+  try{
+    const q1 = query(
+      collection(db,"matches"),
+      where("estudanteId","==", estudanteId),
+      where("status","==","aberto"),
+      limit(1)
+    );
+    const snap = await getDocsFromServer(q1);
+    if (!snap.empty){
+      const m = snap.docs[0].data();
+      return m.tutoraId || null;
+    }
+  }catch(_){}
+  return null;
+}
+
+async function carregarFeedbackTutora(tutoraId){
+  FEEDBACK.clear();
+  try{
+    // não há "list" direto na subcoleção por item; então buscamos item a item
+    const itens = TASKS.map(t => t.id);
+    await Promise.all(itens.map(async (itemId)=>{
+      const fbRef = doc(db,"usuarios",UID,"trilha",itemId,"feedback",tutoraId);
+      const snap = await getDoc(fbRef);
+      if (snap.exists()){
+        const d = snap.data();
+        FEEDBACK.set(itemId, { text: d.text || "", updatedAt: d.updatedAt, tutoraId });
+      }
+    }));
+  }catch(e){
+    console.warn("Falha ao carregar feedback da tutora:", e.code || e.message);
+  }
+}
+
+function aplicarFeedbackNaUI(){
+  TASKS.forEach(t=>{
+    const host = document.getElementById(`tnote_${t.id}`);
+    if (!host) return;
+    const fb = FEEDBACK.get(t.id);
+    if (fb && fb.text){
+      host.textContent = fb.text;
+    }else{
+      host.innerHTML = '<span class="muted">Sem observações da tutora ainda.</span>';
+    }
+  });
+}
 
 function showEmpty(msg){
   emptyState.style.display = "block";
@@ -146,7 +208,7 @@ function renderTasks(){
         <div>
           <div class="note-label">Observações da tutora</div>
           <div class="note-tutor" id="tnote_${t.id}">
-            ${t.tutorNote ? escapeHtml(t.tutorNote) : '<span class="muted">Sem observações da tutora ainda.</span>'}
+            <span class="muted">Carregando…</span>
           </div>
         </div>
       </div>

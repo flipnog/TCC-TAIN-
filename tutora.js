@@ -83,11 +83,14 @@ async function carregarAnalise(tutoraId){
     const div = document.createElement("div");
     div.className = "card-aluna";
     div.innerHTML = `
-      <p class="name">${data.nome || "Estudante"}</p>
-      <div class="muted">${data.categoriaSugerida || "-"} • ${data.papelSugerido || "-"}</div>
-      <div class="progress"><span style="width:${prog.pct}%"></span></div>
-      <div class="muted">${prog.pct}% concluído${prog.total?` • ${prog.done}/${prog.total} tópicos`:''}</div>
-    `;
+       <p class="name">${data.nome || "Estudante"}</p>
+       <div class="muted">${data.categoriaSugerida || "-"} • ${data.papelSugerido || "-"}</div>
+       <div class="progress"><span style="width:${prog.pct}%"></span></div>
+       <div class="muted">${prog.pct}% concluído${prog.total?` • ${prog.done}/${prog.total} tópicos`:''}</div>
+       <div style="margin-top:10px">
+       <a class="btn ghost" href="trilha-tutora.html?id=${id}">Acompanhar trilha</a>
+       </div>
+     `;
     cards.push(div);
   }
 

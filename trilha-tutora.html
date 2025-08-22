@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tech Run Girls — Trilha da Aluna (Tutora)</title>
+
+  <link rel="stylesheet" href="inicio.css"/>
+  <link rel="stylesheet" href="trilha-tutora.css"/>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-row">
+      <div class="brand">TECH RUN GIRLS</div>
+      <nav class="menu" id="menu">
+        <a href="tutora.html">Dashboard</a>
+        <a href="perfil-tutora.html">Perfil</a>
+        <a href="alunas-tutora.html">Alunas</a>
+        <a href="mensagens-tutora.html">Mensagens</a>
+        <button id="btnLogout" class="btn ghost" type="button">Sair</button>
+      </nav>
+      <button id="btnHamb" class="hamb" aria-label="Abrir menu">☰</button>
+    </div>
+    <div id="drawer" class="drawer">
+      <a href="tutora.html">Dashboard</a>
+      <a href="perfil-tutora.html">Perfil</a>
+      <a href="alunas-tutora.html">Alunas</a>
+      <a href="mensagens-tutora.html">Mensagens</a>
+      <button id="btnLogout2" class="btn ghost" style="width:100%" type="button">Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card page-top">
+      <div>
+        <h1 class="title">Trilha da aluna</h1>
+        <div id="alunaNome" class="muted">Carregando…</div>
+        <div id="alunaMeta" class="muted"></div>
+      </div>
+      <div class="top-actions">
+        <a id="btnMsgs" class="btn ghost" href="#">Mensagens</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 class="card-title">Passo a passo</h3>
+      <div id="lista" class="steps"></div>
+    </section>
+  </main>
+
+  <script type="module" src="trilha-tutora.js"></script>
+
+  <script type="module">
+    import { auth } from "./firebase-config.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    const drawer = document.getElementById("drawer");
+    document.getElementById("btnHamb")?.addEventListener("click", ()=> drawer?.classList.toggle("show"));
+    const doLogout = async ()=>{ try{ await signOut(auth); window.location.href="login.html"; }catch(e){ alert(e.message);} };
+    document.getElementById("btnLogout")?.addEventListener("click", doLogout);
+    document.getElementById("btnLogout2")?.addEventListener("click", doLogout);
+  </script>
+</body>
+</html>
